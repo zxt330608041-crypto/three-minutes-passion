@@ -1,0 +1,31 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import HobbyCard from '../components/HobbyCard.astro';
+import {sections} from '../lib/site';
+const all=(await getCollection('hobbies')).sort((a,b)=>a.data.name.localeCompare(b.data.name,'zh-CN'));
+const featured=[...all.filter(h=>h.data.featured),...all.filter(h=>!h.data.featured)].slice(0,6);
+const base=import.meta.env.BASE_URL;
+const todays=all.length?all[(Math.floor(Date.now()/86400000))%all.length]:null;
+---
+<Base title="三分钟热度，也有三分钟的收获">
+ <section class="hero container">
+  <div class="hero-copy"><div class="eyebrow"><span class="tiny-flower">✳</span> THREE MINUTES OF PASSION <span class="hero-line"></span> VOL. 01</div>
+   <h1>三分钟热度，<br /><em>也有三分钟的收获。</em></h1>
+   <p>不必把每一种喜欢都变成擅长。<br/>这里收集各种兴趣爱好、入门方式、真实体验和学习资源。<br/>给每一个短暂却真诚的好奇，一个开始的入口。</p>
+   <div class="hero-actions"><a class="btn primary" href={`${base}hobbies/`}>探索所有兴趣 <span>↗</span></a><a class="quiet-link" href={`${base}discover/`}>随机发现一个兴趣 →</a></div>
+   <div class="hero-stats"><strong>{all.length}</strong><span>种有趣的可能</span><i></i><strong>{sections.length}</strong><span>个探索领域</span></div>
+  </div>
+  <div class="hero-art"><img alt="阳光与木质吉他，象征从生活中发现新的兴趣" src="https://images.unsplash.com/photo-1510915361894-db8b60106cb1?auto=format&fit=crop&w=1100&q=85"/><div class="hero-image-note">STAY CURIOUS.<br/>TRY EVERYTHING. <span>✳</span></div><span class="hero-stamp">JUST<br/>TRY IT ✳</span></div>
+ </section>
+ <section class="container little-try-feature"><div><span class="kicker">JUST THREE MINUTES</span><h2>不如，今天先试三分钟？</h2><p>不必购置装备，也不必决定要不要坚持。从一个小小的行动开始，就已经很好。</p></div>{todays&&<div class="little-try-action"><span>今日微尝试 · {todays.data.name}</span><p>{todays.data.threeMinuteTry}</p><a href={`${base}hobbies/${todays.id}/#try`}>去试试看 ↗</a></div>}</section>
+ <section class="container discovery-entry"><div class="discovery-entry-heading"><span class="kicker">EXPLORE YOUR OWN WAY</span><h2>今天，想怎么玩？</h2><p>给好奇心一个方向，或干脆让它自由漫游。</p></div><div class="discovery-entry-grid"><a href={`${base}find/`}><span>01 / PERSONAL FIT</span><strong>帮我找兴趣 ↗</strong><small>按预算、时间与参与方式寻找</small></a><a href={`${base}collections/#free`}><span>02 / LOW COST</span><strong>几乎不花钱 ↗</strong><small>先用手边已有的东西试试看</small></a><a href={`${base}collections/#weekend`}><span>03 / WEEKEND IDEA</span><strong>周末就能尝试 ↗</strong><small>给下一个休息日一点新鲜感</small></a><a href={`${base}collections/#curious`}><span>04 / LITTLE SURPRISES</span><strong>冷门但有趣 ↗</strong><small>发现不曾想过的生活玩法</small></a></div></section>
+ <section class="container v17-home"><div class="kicker">FOUR NEW WAYS TO EXPLORE · V1.7</div><h2>给好奇心，四种新玩法。</h2><div class="v17-home-grid"><a href={`${base}quiz/`}><span>✧ 01</span><strong>兴趣探索测试 ↗</strong><small>回答几个问题，找到符合当下偏好的兴趣</small></a><a href={`${base}compare/`}><span>⇄ 02</span><strong>兴趣对比实验室 ↗</strong><small>把两个兴趣放在一起认真看看</small></a><a href={`${base}passport/`}><span>✦ 03</span><strong>我的探索护照 ↗</strong><small>每一次发现，都是一枚小小印章</small></a><a href={`${base}mood/`}><span>☼ 04</span><strong>今日心情推荐 ↗</strong><small>今天想安静，还是想来点新鲜的？</small></a></div></section>
+ <section class="container intro-band"><span class="intro-index">01 / THE IDEA</span><p>短暂的喜欢，<br/><span>也值得被认真对待。</span></p><div>你可以深入，也可以浅尝；可以坚持，也可以放下。每一次尝试，都让生活多一种可能。</div></section>
+ <section class="container daily-section"><div class="daily-heading"><div class="kicker">THREE MINUTES, ONE NEW THING</div><h2>今天，三分钟了解一个兴趣。</h2><p>也许你不会立刻开始，但至少会知道，世界上还有这样一件有趣的事。</p></div>{todays && <div class="daily-card"><span class="daily-emoji">{todays.data.emoji}</span><div><span class="kicker">TODAY'S LITTLE DISCOVERY</span><h3>{todays.data.name}</h3><p>{todays.data.intro}</p><a href={`${base}hobbies/${todays.id}/`}>了解这个兴趣 ↗</a></div><a class="daily-refresh" href={`${base}discover/`}>再换一个 →</a></div>}</section>
+ <section class="container section-block"><div class="section-head"><div><div class="kicker">START SOMEWHERE, NO PRESSURE</div><h2>喜欢的话，就先试试看 <span>✳</span></h2><p class="section-caption">不必马上买装备，也不用立刻规划未来。先看看它是什么，再决定要不要开始。</p></div><a href={`${base}hobbies/`}>浏览全部兴趣 ↗</a></div><div class="featured-grid">{featured.map(h=><HobbyCard hobby={h}/>)}</div></section>
+ <section class="category-section"><div class="container"><div class="section-head"><div><div class="kicker">SO MANY WAYS TO ENJOY LIFE</div><h2>生活不止一种玩法</h2></div><p class="section-caption">从音乐、绘画到观鸟、天文，总有一些你还没发现的热爱。</p></div><div class="category-grid">{sections.map((s,i)=><a class="category-tile" href={`${base}hobbies/?category=${encodeURIComponent(s.name)}`}><span class="category-number">{String(i+1).padStart(2,'0')}</span><span class="category-symbol">{s.emoji}</span><div><strong>{s.name}</strong><small>{s.blurb}</small></div><span class="category-arrow">↗</span></a>)}</div></div></section>
+ <section class="container three-minutes-method"><div class="kicker">A GENTLE PLACE TO BEGIN</div><h2>不必精通，也可以先试试看。</h2><p>我们会帮你了解一项兴趣的乐趣、时间与费用、可能遇到的困难，以及最简单的第一步。</p><div class="method-grid"><div><strong>01</strong><h3>认识它</h3><p>这项兴趣是什么，为什么会让人着迷？</p></div><div><strong>02</strong><h3>浅尝一下</h3><p>有没有低成本、低压力的体验方法？</p></div><div><strong>03</strong><h3>想学再深入</h3><p>找靠谱的教程与学习路线，按自己的节奏继续。</p></div></div></section>
+ <section class="container bottom-feature"><div><div class="kicker">A SURPRISE FOR YOU</div><h2>不知道看什么？<br/><em>随机遇见一种热爱。</em></h2><p>有时候，真正打动你的，<br/>不是你原本计划寻找的东西。</p><a class="btn primary" href={`${base}discover/`}>给我一点新鲜的 <span>↗</span></a></div><div class="bottom-feature-art"><span>✻</span><p>COLLECT LITTLE<br/>MOMENTS OF JOY</p></div></section>
+ <section class="container contribution-banner"><div><span class="kicker">GROW TOGETHER</span><h3>把你喜欢过的事，也留在这里。</h3><p>你可以推荐一种兴趣，也可以分享短暂或长久的真实经历。哪怕只试过一个周末，也值得被记录。</p></div><a href={`${base}contribute/`} class="btn outline">推荐兴趣 / 分享经验 ↗</a></section>
+</Base>

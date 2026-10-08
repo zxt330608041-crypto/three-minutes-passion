@@ -1,0 +1,17 @@
+---
+import {getCollection} from 'astro:content';
+import Base from '../layouts/Base.astro';
+import HobbyCard from '../components/HobbyCard.astro';
+const all=await getCollection('hobbies');
+const picks=[
+{key:'free',title:'几乎不花钱',eyebrow:'LOW-COST LITTLE JOYS',tagline:'从已有的东西开始，不一定要买新装备。',description:'这些条目被标记为“免费可试”或“低预算”。费用是探索性的粗略分类，不代表所有进阶玩法都便宜。',filter:h=>['free','low'].includes(h.data.budgetLevel),accent:'sage'},
+{key:'weekend',title:'周末就能尝试',eyebrow:'JUST GIVE IT A WEEKEND',tagline:'给周末留一点点新鲜感。',description:'从室内手作、日常创作到轻量探索，挑一个你愿意开始的兴趣。能否当天上手、是否需要预约仍要看具体项目。',filter:h=>h.data.difficulty==='easy'&&(['生活与养成','美食与饮品','艺术与设计','手工与制作','知识与思维','游戏与娱乐'].includes(h.data.category)),accent:'peach'},
+{key:'curious',title:'冷门但有趣',eyebrow:'OFF THE BEATEN PATH',tagline:'有些快乐，藏在不起眼的角落。',description:'编辑挑选的相对小众兴趣。这里的“冷门”是策展标签，并不代表客观搜索热度排名。',filter:h=>/观鸟|微缩|橡皮章|拇指琴|天文|观云|水族|苔藓|模型|昆虫|标本|拼贴|无线电|篆刻|生态瓶|定格动画|盆景|卡林巴/.test(h.data.name),accent:'sand'}
+];
+const base=import.meta.env.BASE_URL;
+---
+<Base title="兴趣主题合集" description="几乎不花钱、周末就能尝试、冷门但有趣：从专题入口发现新的可能。">
+<section class="container collection-hero"><span class="kicker">CURATED LITTLE DISCOVERIES</span><h1>有时候，<em>需要一点灵感。</em></h1><p>不想从一百个名字里盲选？先从一个让你心动的主题开始。</p><div class="collection-nav">{picks.map((g,i)=><a href={`#${g.key}`}>{String(i+1).padStart(2,'0')} · {g.title} ↓</a>)}</div></section>
+{picks.map((group,index)=>{const found=all.filter(group.filter).sort((a,b)=>a.data.name.localeCompare(b.data.name,'zh-CN'));return <section class={`collection-group collection-${group.accent}`} id={group.key}><div class="container"><div class="collection-header"><div><span class="kicker">{group.eyebrow} / 0{index+1}</span><h2>{group.title}<span> ✳</span></h2><h3>{group.tagline}</h3><p>{group.description}</p></div><span class="collection-count">{found.length} 种兴趣</span></div>{found.length>0?<div class="featured-grid">{found.slice(0,9).map(h=><HobbyCard hobby={h}/>)}</div>:<p>专题内容正在整理中。</p>}<div class="collection-more"><a class="btn outline" href={`${base}find/`}>用自己的条件找兴趣 ↗</a></div></div></section>})}
+<section class="container collection-footer"><p>没遇到喜欢的？没关系，<br/><strong>世界还有很多种玩法。</strong></p><a class="btn primary" href={`${base}hobbies/`}>浏览全部 100 种兴趣 ↗</a></section>
+</Base>

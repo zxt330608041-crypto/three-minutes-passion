@@ -1,0 +1,14 @@
+---
+import {getCollection} from 'astro:content';
+import Base from '../layouts/Base.astro';
+import HobbyCard from '../components/HobbyCard.astro';
+const all=await getCollection('hobbies');
+const base=import.meta.env.BASE_URL;
+---
+<Base title="我的兴趣足迹" description="有点心动、正在发热、曾经热爱；记录每一次尝试。">
+<section class="container directory-header footprint-intro"><div class="kicker">EVERY SPARK COUNTS</div><h1>我的兴趣足迹<span class="period">.</span></h1><p>那些让你心动、正在尝试或曾经喜欢的事，都值得被记住。</p><p id="saved-count" aria-live="polite">正在读取浏览器中的记录…</p></section>
+<section class="container footprint-dashboard"><div><span>有点心动</span><strong data-status-count="curious">0</strong><small>还想试试的事</small></div><div><span>正在发热</span><strong data-status-count="active">0</strong><small>最近在做的事</small></div><div><span>曾经热爱</span><strong data-status-count="past">0</strong><small>认真喜欢过的事</small></div></section>
+<section class="container footprint-list-section"><div class="footprint-list-head"><div><h2>每一段喜欢，都算数。</h2><p>点「编辑足迹」，可以随时更改状态或补充一段回忆。</p></div><label>查看状态 <select id="footprint-filter"><option value="all">全部兴趣</option><option value="curious">有点心动</option><option value="active">正在发热</option><option value="past">曾经热爱</option></select></label></div>
+<div id="favorites-empty" class="favorites-empty" hidden><div class="empty-spark" aria-hidden="true">✳</div><h2>每一次心动，都值得被记住。</h2><p>从一个让你好奇的兴趣开始。先了解，再试三分钟；什么时候开始都不晚。</p><a class="btn primary" href={`${base}hobbies/`}>探索感兴趣的事 ↗</a></div>
+<div class="footprint-grid">{all.map(h=><div data-footprint-entry={h.id} hidden class="footprint-card"><HobbyCard hobby={h} compact/><div class="footprint-card-details"><span class="footprint-status" data-footprint-status></span><p data-footprint-note></p><button type="button" class="save-hobby" data-edit-footprint={h.id} data-hobby-name={h.data.name}>编辑足迹 ✎</button></div></div>)}</div><p class="favorite-note">记录保存在当前浏览器中，不会同步到别的设备。更换浏览器、使用无痕模式或清除网站数据可能使记录消失。V1.5及更早版本的收藏会自动视为「有点心动」。</p></section>
+</Base>
