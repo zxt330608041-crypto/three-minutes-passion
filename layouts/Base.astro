@@ -1,0 +1,88 @@
+---
+import '../styles/global.css';
+const {title='发现兴趣，先试试看', description='三分钟热度：发现各种兴趣爱好、成本、入门方式、学习资源与真实经验。短暂的喜欢，也值得被认真对待。'} = Astro.props;
+const base = import.meta.env.BASE_URL;
+const current = Astro.url.pathname;
+---
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#f8f5ef" />
+  <meta name="description" content={description} />
+  <title>{title} · 三分钟热度</title>
+  <link rel="icon" type="image/svg+xml" href={`${base}favicon.svg`} />
+  <link rel="preconnect" href="https://images.unsplash.com" crossorigin />
+</head>
+<body>
+  <a class="skip-to-content" href="#main-content">跳转到主要内容</a>
+  <header class="site-header">
+    <div class="container nav-row">
+      <a class="brand" href={base} aria-label="三分钟热度首页"><span class="brand-symbol"><svg class="brand-spark" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M30 6.5c.9 12.9 3.5 18.2 9.1 23.5-5.6 5.3-8.2 10.6-9.1 23.5-.9-12.9-3.5-18.2-9.1-23.5C26.5 24.7 29.1 19.4 30 6.5Z" fill="currentColor"/><path d="M9 10l3.2 5.8L18 19l-5.8 3.2L9 28l-3.2-5.8L0 19l5.8-3.2L9 10ZM50 33l2.4 4.6L57 40l-4.6 2.4L50 47l-2.4-4.6L43 40l4.6-2.4L50 33Z" fill="currentColor" opacity=".74"/></svg></span><span class="brand-lettering"><strong class="brand-zh">三分钟热度</strong><span class="brand-en">THREE MINUTES OF PASSION</span></span></a>
+      <nav class="primary-nav" aria-label="主导航">
+        <a class={current===base?'active':''} href={base}>首页</a>
+        <details class="explore-menu">
+          <summary class={['/hobbies/','/find/','/quiz/','/compare/','/mood/','/discover/'].some(path=>current.includes(path))?'active':''}>探索兴趣 <span aria-hidden="true">⌄</span></summary>
+          <div class="explore-dropdown">
+            <a href={`${base}hobbies/`}>兴趣目录 <small>浏览100种兴趣</small></a>
+            <a href={`${base}find/`}>帮我找兴趣 <small>按预算与时间筛选</small></a>
+            <a href={`${base}quiz/`}>兴趣探索测试 <small>发现适合自己的爱好</small></a>
+            <a href={`${base}compare/`}>兴趣对比 <small>两种兴趣并排看看</small></a>
+            <a href={`${base}mood/`}>今日心情 <small>跟着心情找灵感</small></a>
+            <a href={`${base}discover/`}>随机发现 <small>遇见意想不到的兴趣</small></a>
+          </div>
+        </details>
+        <a class={current.includes('/collections/')?'active':''} href={`${base}collections/`}>主题合集</a>
+        <details class="explore-menu personal-menu">
+          <summary class={['/favorites/','/passport/'].some(path=>current.includes(path))?'active':''}>我的足迹 <span class="favorite-count" aria-label="收藏数量"></span> <span aria-hidden="true">⌄</span></summary>
+          <div class="explore-dropdown">
+            <a href={`${base}favorites/`}>兴趣足迹 <small>记住每一次心动</small></a>
+            <a href={`${base}passport/`}>探索护照 <small>给尝试盖一枚印章</small></a>
+          </div>
+        </details>
+      </nav>
+      <details class="mobile-nav" id="mobile-nav">
+        <summary aria-label="展开网站导航"><span class="hamburger" aria-hidden="true">☰</span><span>菜单</span></summary>
+        <nav class="mobile-nav-panel" aria-label="移动端导航">
+          <a href={base}>首页</a><a href={`${base}hobbies/`}>兴趣目录</a><a href={`${base}find/`}>帮我找兴趣</a><a href={`${base}quiz/`}>兴趣测试</a><a href={`${base}compare/`}>兴趣对比</a><a href={`${base}mood/`}>今日心情</a><a href={`${base}collections/`}>主题合集</a><a href={`${base}discover/`}>随机发现</a><a href={`${base}favorites/`}>兴趣足迹</a><a href={`${base}passport/`}>探索护照</a><a href={`${base}contribute/`}>分享兴趣</a><a href={`${base}about/`}>关于我们</a>
+        </nav>
+      </details>
+      <a class="nav-about" href={`${base}about/`}>关于我们 <span>↗</span></a>
+    </div>
+  </header>
+  <main id="main-content" tabindex="-1"><slot /></main>
+  <dialog id="footprint-dialog" class="footprint-dialog" aria-labelledby="footprint-hobby-name">
+    <form id="footprint-form" class="footprint-form">
+      <input type="hidden" id="footprint-id" />
+      <div class="kicker">MY LITTLE SPARKS</div>
+      <h2 id="footprint-hobby-name">兴趣足迹</h2>
+      <label for="footprint-status">现在与它的关系</label>
+      <select id="footprint-status"><option value="curious">♡ 有点心动</option><option value="active">✳ 正在发热</option><option value="past">✦ 曾经热爱</option></select>
+      <label for="footprint-note">想记住的一句话（可选，最多500字）</label>
+      <textarea id="footprint-note" maxlength="500" rows="5" placeholder="为什么心动？学到了什么？放下以后留下了什么？"></textarea>
+      <p>只保存在当前浏览器，不会自动上传到网站。</p>
+      <div class="footprint-actions"><button type="button" id="footprint-remove" class="footprint-remove">移除记录</button><button type="button" id="footprint-cancel" class="btn outline">取消</button><button type="submit" class="btn primary">保存足迹</button></div>
+    </form>
+  </dialog>
+  <script src="../scripts/favorites.ts"></script>
+  <script>
+    // Ensure only one navigation dropdown is open, and dismiss when clicking outside or pressing Escape.
+    const menus = [...document.querySelectorAll<HTMLDetailsElement>('.primary-nav details, .mobile-nav')];
+    menus.forEach(menu => menu.addEventListener('toggle', () => {
+      if (menu.open) menus.filter(other => other !== menu).forEach(other => { other.open = false; });
+    }));
+    document.addEventListener('click', (event) => {
+      if (!(event.target instanceof Node)) return;
+      menus.forEach(menu => { if (!menu.contains(event.target)) menu.open = false; });
+    });
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape') {
+        menus.forEach(menu => { menu.open = false; });
+        if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
+      }
+    });
+  </script>
+  <footer class="site-footer"><div class="container footer-inner"><div><div class="footer-mark">✦ 三分钟热度</div><p>愿你永远有开始一件新鲜事的勇气，也有随时放下它的自由。</p></div><div><a href={`${base}hobbies/`}>探索兴趣</a><a href={`${base}contribute/`}>提交建议</a><a href={`${base}about/`}>关于本站</a></div><small>© {new Date().getFullYear()} 三分钟热度 · 一个关于好奇、尝试与热爱的地方</small></div></footer>
+</body>
+</html>

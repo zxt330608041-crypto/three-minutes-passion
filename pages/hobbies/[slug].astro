@@ -1,0 +1,35 @@
+---
+import {getCollection,render,type CollectionEntry} from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import HobbyCard from '../../components/HobbyCard.astro';
+import {diffLabel,url} from '../../lib/site';
+export async function getStaticPaths(){const all=await getCollection('hobbies');return all.map(h=>({params:{slug:h.id},props:{hobby:h,related:all.filter(x=>x.id!==h.id&&(x.data.category===h.data.category||x.data.tags.some(t=>h.data.tags.includes(t)))).slice(0,3)}}));}
+const {hobby,related}=Astro.props as {hobby:CollectionEntry<'hobbies'>,related:CollectionEntry<'hobbies'>[]};
+const {Content}=await render(hobby);
+const d=hobby.data;
+const base=import.meta.env.BASE_URL;
+---
+<Base title={d.name} description={d.intro}>
+ <section class="container article-breadcrumb"><a href={base}>首页</a> / <a href={`${base}hobbies/`}>兴趣目录</a> / <span>{d.name}</span></section>
+ <article class="container article-layout"><div class="article-content"><div class="article-category">{d.category} <span>·</span> {d.level==='guide'?'深度指南':'兴趣速览'}</div><h1>{d.emoji} {d.name}<span class="period">.</span></h1><p class="article-lead">{d.intro}</p><div class="article-cover" style={d.image?`background-image:linear-gradient(0deg,rgba(18,24,18,.15),transparent),url('${d.image}')`:''}><span>{d.emoji}</span></div>
+  <div class="article-facts"><div><small>启动预算</small><strong>{d.budget}</strong></div><div><small>学习难度</small><strong>{diffLabel[d.difficulty]}</strong></div><div><small>活动环境</small><strong>{d.setting.join(' / ')}</strong></div><div><small>参与方式</small><strong>{d.mode.join(' / ')}</strong></div>{d.weeklyTime&&<div><small>建议投入时间</small><strong>{d.weeklyTime}</strong></div>}{d.suitableFor&&<div><small>适合谁</small><strong>{d.suitableFor}</strong></div>}</div>
+  <div class="article-tags">{d.tags.map(t=><span>#{t}</span>)}</div>
+  <section class="three-minute-challenge" id="try"><div class="challenge-kicker">✳ THREE MINUTES, ONE LITTLE START</div><h2>先试三分钟，就很好。</h2><p>{d.threeMinuteTry}</p><div class="challenge-footer"><span>不必准备得很完美，也不用保证会坚持。</span><button type="button" class="save-hobby" data-save-hobby={hobby.id} data-hobby-name={d.name} aria-pressed="false">♡ 加入我的兴趣足迹</button></div></section>
+  <section class="article-section" id="worth"><div class="section-ordinal">01 / THE GOOD PART</div><h2>为什么值得尝试？</h2><ul class="nice-list">{d.benefits.map(b=><li>{b}</li>)}</ul></section>
+  <section class="article-section" id="caution"><div class="section-ordinal">02 / GOOD TO KNOW</div><h2>需要提前知道的事</h2><ul class="nice-list caution-list">{d.cautions.map(b=><li>{b}</li>)}</ul></section>
+  <section class="article-section" id="start"><div class="section-ordinal">03 / FIRST STEPS</div><h2>从哪里开始？</h2><ol class="step-list">{d.steps.map((s,i)=><li><span>{String(i+1).padStart(2,'0')}</span><p>{s}</p></li>)}</ol></section>
+  {d.resources.length>0&&<section class="article-section" id="resources"><div class="section-ordinal">04 / SELECTED RESOURCES</div><h2>学习资源</h2><p class="section-explainer">外部课程与资料按用途说明；「中文视频检索」并不是本站审核过的具体课程。可能存在语言或网络访问限制。</p><div class="resource-list">{d.resources.map(r=><a target="_blank" rel="noopener noreferrer" href={r.url}><div><span>{r.kind}</span><strong>{r.name}</strong><small>{r.note}</small></div><span class="resource-arrow">↗</span></a>)}</div></section>}
+  {d.level==='guide'&&<section class="article-section extra-guide" id="deep"><div class="section-ordinal">05 / A DEEPER LOOK</div><h2>再深入一点</h2><div class="markdown-body"><Content /></div></section>}
+  <section class="article-next-step" aria-labelledby="article-next-title">
+    <div class="kicker">AND THEN, IF YOU LIKE</div>
+    <h2 id="article-next-title">试过以后，也可以留下一点痕迹。</h2>
+    <p>不论只是心动了一下，还是认真尝试了一段时间，都值得被记录下来。</p>
+    <div class="article-next-actions">
+      <button type="button" class="btn primary save-hobby" data-save-hobby={hobby.id} data-hobby-name={d.name} aria-pressed="false">♡ 记录我的兴趣足迹</button>
+      <a class="btn outline" href={`${base}favorites/`}>查看我的足迹 ↗</a>
+    </div>
+  </section>
+  <div class="article-disclaimer">✳ 这是一份探索指南，费用及学习难度会随地区、设备和个人情况变化。本站会持续更新内容，不把主观喜好当成唯一答案。<br/>最近更新：{d.updated.toLocaleDateString('zh-CN',{timeZone:'UTC'})}</div>
+ </div><aside class="article-aside"><div class="aside-sticky"><span class="kicker">ON THIS PAGE</span><h3>本页导航</h3><a href="#try">✳ 三分钟尝试</a><a href="#worth">01 为什么值得尝试</a><a href="#caution">02 需要注意的事</a><a href="#start">03 入门第一步</a>{d.resources.length>0&&<a href="#resources">04 学习资源</a>}{d.level==='guide'&&<a href="#deep">05 深度内容</a>}<div class="aside-note">你有真实的经验想分享吗？<a href={`${base}contribute/?hobby=${encodeURIComponent(d.name)}`}>推荐内容或投稿 ↗</a></div></div></aside></article>
+ {related.length>0&&<section class="container related-section"><div class="section-head"><div><div class="kicker">KEEP EXPLORING</div><h2>也许你还会喜欢</h2></div><a href={`${base}hobbies/`}>更多兴趣 ↗</a></div><div class="featured-grid">{related.map(h=><HobbyCard hobby={h}/>)}</div></section>}
+</Base>

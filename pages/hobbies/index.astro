@@ -1,0 +1,25 @@
+---
+import {getCollection} from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import HobbyCard from '../../components/HobbyCard.astro';
+import {sections} from '../../lib/site';
+const all=(await getCollection('hobbies')).sort((a,b)=>a.data.name.localeCompare(b.data.name,'zh-CN'));
+---
+<Base title="兴趣目录" description="搜索和筛选兴趣：音乐、艺术、运动、生活、户外、知识与更多。">
+ <section class="container directory-header"><div class="kicker">THE HOBBY INDEX / A–Z</div><h1>兴趣目录<span class="period">.</span></h1><p>一份持续生长的兴趣清单。从熟悉的开始，也欢迎遇见未知。</p></section>
+ <section class="container directory-layout"><aside class="directory-sidebar"><div class="sidebar-label">分类浏览 <span>EXPLORE</span></div><div class="category-buttons"><button class="category-filter selected" type="button" data-category="all">全部兴趣 <span>{all.length}</span></button>{sections.map(s=><button class="category-filter" type="button" data-category={s.name}>{s.emoji} {s.name}<span>{all.filter(h=>h.data.category===s.name).length}</span></button>)}</div></aside><div class="directory-main"><div class="filter-toolbar"><label class="search-field"><span>⌕</span><input id="search" type="search" placeholder="搜索兴趣名称、介绍或标签..." autocomplete="off" aria-label="搜索兴趣"/></label><select id="budget" aria-label="启动预算"><option value="all">全部预算</option><option value="free">免费可试</option><option value="low">低预算</option><option value="medium">适中预算</option><option value="high">较高预算</option></select><select id="difficulty" aria-label="上手难度"><option value="all">全部难度</option><option value="easy">易上手</option><option value="medium">需要练习</option><option value="hard">挑战较高</option></select></div><div class="results-meta"><span id="result-count">找到 {all.length} 个兴趣</span><button id="reset" type="button">清除筛选 ↺</button></div><div class="catalog-grid" id="catalog">{all.map(h=><div class="filter-item" data-category={h.data.category} data-budget={h.data.budgetLevel} data-difficulty={h.data.difficulty} data-search={`${h.data.name} ${h.data.intro} ${h.data.tags.join(' ')}`}><HobbyCard hobby={h} compact/></div>)}</div><div class="no-results" id="no-results" hidden>还没有找到匹配的兴趣。换一个关键词试试吧。 ✳</div></div></section>
+ <script>
+  const items=[...document.querySelectorAll<HTMLElement>('.filter-item')];
+  const search=document.querySelector<HTMLInputElement>('#search')!;
+  const budget=document.querySelector<HTMLSelectElement>('#budget')!;
+  const difficulty=document.querySelector<HTMLSelectElement>('#difficulty')!;
+  const categoryButtons=[...document.querySelectorAll<HTMLButtonElement>('.category-filter')];
+  let category='all';
+  const params=new URLSearchParams(location.search);
+  if(params.get('category') && categoryButtons.some(b=>b.dataset.category===params.get('category'))) category=params.get('category')!;
+  function apply(){const q=search.value.trim().toLocaleLowerCase();let count=0;for(const item of items){const ok=(category==='all'||item.dataset.category===category)&&(budget.value==='all'||item.dataset.budget===budget.value)&&(difficulty.value==='all'||item.dataset.difficulty===difficulty.value)&&(item.dataset.search||'').toLocaleLowerCase().includes(q);item.hidden=!ok;if(ok)count++;}document.querySelector('#result-count')!.textContent=`找到 ${count} 个兴趣`;document.querySelector<HTMLElement>('#no-results')!.hidden=count>0;categoryButtons.forEach(b=>b.classList.toggle('selected',b.dataset.category===category));}
+  categoryButtons.forEach(b=>b.addEventListener('click',()=>{category=b.dataset.category||'all';const u=new URL(location.href);category==='all'?u.searchParams.delete('category'):u.searchParams.set('category',category);history.replaceState(null,'',u);apply();}));
+  search.addEventListener('input',apply);budget.addEventListener('change',apply);difficulty.addEventListener('change',apply);
+  document.querySelector('#reset')!.addEventListener('click',()=>{search.value='';budget.value='all';difficulty.value='all';category='all';history.replaceState(null,'',location.pathname);apply();});apply();
+ </script>
+</Base>

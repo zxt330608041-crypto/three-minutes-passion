@@ -1,0 +1,12 @@
+---
+import {getCollection} from 'astro:content';
+import Base from '../layouts/Base.astro';
+import {url} from '../lib/site';
+const all=await getCollection('hobbies');const base=import.meta.env.BASE_URL;
+const options=all.map(h=>({name:h.data.name,emoji:h.data.emoji,intro:h.data.intro,category:h.data.category,link:url(h.id,base)}));
+---
+<Base title="随机发现"><section class="container discover-page"><div class="kicker">LET THE UNIVERSE DECIDE</div><h1>给好奇心，一点<span>偶然。</span></h1><p>下一项让你心动的兴趣，可能从来不在计划里。</p><div class="discover-box"><div class="discover-icon" id="discovery-symbol">✳</div><div class="kicker" id="discovery-category">A SMALL SURPRISE</div><h2 id="discovery-name">准备好了吗？</h2><p id="discovery-intro">轻轻一点，认识一项新的兴趣。</p><a id="discovery-link" class="btn outline" href={`${base}hobbies/`} hidden>阅读兴趣指南 ↗</a></div><button type="button" id="draw" class="btn primary big">✳ 随机发现一个兴趣</button><a href={`${base}hobbies/`} class="quiet-link">或者从全部兴趣慢慢逛 →</a></section>
+<script define:vars={{options}}>
+ const button=document.querySelector('#draw');let prev=-1;
+ button.addEventListener('click',()=>{let i=Math.floor(Math.random()*options.length);if(options.length>1&&i===prev)i=(i+1)%options.length;prev=i;const h=options[i];document.querySelector('#discovery-symbol').textContent=h.emoji;document.querySelector('#discovery-category').textContent=h.category;document.querySelector('#discovery-name').textContent=h.name;document.querySelector('#discovery-intro').textContent=h.intro;const a=document.querySelector('#discovery-link');a.href=h.link;a.hidden=false;button.textContent='↻ 再发现一个';});
+</script></Base>
