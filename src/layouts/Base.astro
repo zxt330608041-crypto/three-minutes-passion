@@ -45,7 +45,22 @@ const current = Astro.url.pathname;
       <details class="mobile-nav" id="mobile-nav">
         <summary aria-label="展开网站导航"><span class="hamburger" aria-hidden="true">☰</span><span>菜单</span></summary>
         <nav class="mobile-nav-panel" aria-label="移动端导航">
-          <a href={base}>首页</a><a href={`${base}hobbies/`}>兴趣目录</a><a href={`${base}find/`}>帮我找兴趣</a><a href={`${base}quiz/`}>兴趣测试</a><a href={`${base}compare/`}>兴趣对比</a><a href={`${base}mood/`}>今日心情</a><a href={`${base}collections/`}>主题合集</a><a href={`${base}discover/`}>随机发现</a><a href={`${base}favorites/`}>兴趣足迹</a><a href={`${base}passport/`}>探索护照</a><a href={`${base}contribute/`}>分享兴趣</a><a href={`${base}about/`}>关于我们</a>
+          <div class="mobile-menu-top"><span>探索菜单 <small>EXPLORE MORE</small></span><button class="mobile-menu-close" type="button" aria-label="关闭菜单">×</button></div>
+          <div class="mobile-menu-group-title">发现兴趣</div>
+          <div class="mobile-menu-grid">
+            <a href={`${base}hobbies/`}><span aria-hidden="true">▦</span>兴趣目录</a>
+            <a href={`${base}find/`}><span aria-hidden="true">⌕</span>帮我找兴趣</a>
+            <a href={`${base}quiz/`}><span aria-hidden="true">✧</span>兴趣测试</a>
+            <a href={`${base}compare/`}><span aria-hidden="true">⇄</span>兴趣对比</a>
+            <a href={`${base}mood/`}><span aria-hidden="true">☼</span>今日心情</a>
+            <a href={`${base}discover/`}><span aria-hidden="true">✦</span>随机发现</a>
+          </div>
+          <div class="mobile-menu-group-title">我的空间</div>
+          <div class="mobile-menu-grid">
+            <a href={`${base}favorites/`}><span aria-hidden="true">♡</span>兴趣足迹</a>
+            <a href={`${base}passport/`}><span aria-hidden="true">▤</span>探索护照</a>
+          </div>
+          <div class="mobile-menu-footer"><a href={base}>首页</a><a href={`${base}collections/`}>主题合集</a><a href={`${base}contribute/`}>分享兴趣</a><a href={`${base}about/`}>关于我们</a></div>
         </nav>
       </details>
       <a class="nav-about" href={`${base}about/`}>关于我们 <span>↗</span></a>
@@ -69,9 +84,11 @@ const current = Astro.url.pathname;
   <script>
     // Ensure only one navigation dropdown is open, and dismiss when clicking outside or pressing Escape.
     const menus = [...document.querySelectorAll<HTMLDetailsElement>('.primary-nav details, .mobile-nav')];
+    document.querySelector<HTMLButtonElement>('.mobile-menu-close')?.addEventListener('click', () => { const menu = document.querySelector<HTMLDetailsElement>('#mobile-nav'); if (menu) { menu.open = false; menu.querySelector('summary')?.focus(); } });
     menus.forEach(menu => menu.addEventListener('toggle', () => {
       if (menu.open) menus.filter(other => other !== menu).forEach(other => { other.open = false; });
     }));
+    document.querySelectorAll<HTMLAnchorElement>('.mobile-nav-panel a').forEach(link => link.addEventListener('click', () => { const menu = document.querySelector<HTMLDetailsElement>('#mobile-nav'); if (menu) menu.open = false; }));
     document.addEventListener('click', (event) => {
       if (!(event.target instanceof Node)) return;
       menus.forEach(menu => { if (!menu.contains(event.target)) menu.open = false; });
